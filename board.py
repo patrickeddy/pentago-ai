@@ -15,7 +15,6 @@ class GameBoard():
         return [["0", "0", "0"], ["0", "0", "0"], ["0", "0", "0"]]
 
     def print_full_board(self):
-        #NEED TO FIX TO CHANGE HOW 2 AND 3 ARE DISPLAYED
         for i in range(6):
             print("") # add a new line for the board here
             if (i == 3):
@@ -29,7 +28,7 @@ class GameBoard():
                         print str(self.board1[i][j]),
                     else:
                         # third board
-                        print str(self.board3[i][j]),
+                        print str(self.board3[i%3][j]),
                 else:
                     if (i < 3):
                         # second board
