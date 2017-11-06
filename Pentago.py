@@ -5,50 +5,70 @@ TCSS 435
 PA 2 - Pentago
 """
 
-def get_empty_board():
-    return [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+"""
+HOW TO RUN:
+Play Pentago by running in terminal:
+`python Pentago.py`
 
-# get empty boards for the sub-boards
-board1 = get_empty_board()
-board2 = get_empty_board()
-board3 = get_empty_board()
-board4 = get_empty_board()
+HOW TO MOVE:
+Each
+"""
 
-def print_full_board():
-    for i in range(6):
-        print("") # add a new line for the board here
-        if (i == 3):
-            print "- - - - - - - "
-        for j in range(6):
-            if j == 3:
-                print "|",
-            if (j < 3):
-                if (i < 3):
-                    # first board
-                    print str(board1[i][j]),
-                else:
-                    # second board
-                    print str(board2[i%3][j]),
-            else:
-                if (i < 3):
-                    # second board
-                    print str(board3[i][j%3]),
-                else:
-                    # third board
-                    print str(board4[i%3][j%3]),
-    print("")
+import board
+import ai
 
-def play_move(player, play):
-    parts = play.split(" ")
+# Setup the game
+game_ended = False
+player_color = ""
 
-    pos = parts[0]
-    rot = parts[1]
+# Get which color the player wants to be
+player_color = str(raw_input("Welcome to Pentago\nPlease choose a color (b, w) : "))
+if player_color != "b" and player_color != "w":
+    print("Error: Please choose w or b for your color.")
+    exit()
+move_order = int(raw_input("Would you like to move first (1) or second (2)? : "))
+if move_order != 1 and move_order != 2:
+    print("Error: Please choose first or second move.")
+    exit()
 
-    print("Player is " + str(player))
-    print("Pos is: " + str(pos))
-    print("Rot is: " + str(rot))
+print("\nHere we go...\n")
 
-    return
+# Create the gameboard
+gb = board.GameBoard()
+if move_order == 1:
+    gb.turn = player_color
+else:
+    gb.turn = "b" if player_color != "b" else "w"
 
-print_full_board()
-play_move("b", "4/2 4L")
+# Create the AI
+ai_color = "b" if player_color == "w" else "w"
+ai = ai.AI(ai_color)
+
+# GAME INTERFACE METHODS
+def ai_move():
+    """Method that moves the AI based on Minimax."""
+    print("\nAI moving...\n")
+    ai.move(gb)
+    gb.complete_turn()
+
+def prompt_player_move():
+    """Prompts and initiates action by player."""
+    move = str(raw_input("\nYour turn to move.\nEx: 4/2 2L\n\n: ")).upper()
+    if (move != "Q"):
+        success = gb.play_move(player_color, move)
+        if not success:
+            print("Invalid position. Please choose another position. ")
+            prompt_player_move()
+
+    gb.complete_turn()
+
+
+# GAME LOOP
+print("- - - - - - - - - - - - - - - - - - - ")
+while True:
+    if gb.turn == player_color: # player first
+        gb.print_full_board()
+        prompt_player_move()
+    else: # let ai go first
+        ai_move()
+    print("- - - - - - - - - - - - - - - - - - - ")
