@@ -28,12 +28,12 @@ class GameBoard():
                         # first board
                         print str(self.board1[i][j]),
                     else:
-                        # second board
-                        print str(self.board2[i%3][j]),
+                        # third board
+                        print str(self.board3[i][j]),
                 else:
                     if (i < 3):
                         # second board
-                        print str(self.board3[i][j%3]),
+                        print str(self.board2[i][j%3]),
                     else:
                         # third board
                         print str(self.board4[i%3][j%3]),
