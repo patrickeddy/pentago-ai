@@ -18,24 +18,26 @@ class GameBoard():
         for i in range(6):
             print("") # add a new line for the board here
             if (i == 3):
-                print "- - - - - - - "
+                print "+------+------+"
             for j in range(6):
-                if j == 3:
+                if j==0 or j == 3:
                     print "|",
                 if (j < 3):
                     if (i < 3):
                         # first board
-                        print str(self.board1[i][j]),
+                        print " " + str(self.board1[i][j]),
                     else:
                         # third board
-                        print str(self.board3[i%3][j]),
+                        print " " + str(self.board3[i%3][j]),
                 else:
                     if (i < 3):
                         # second board
-                        print str(self.board2[i][j%3]),
+                        print " " + str(self.board2[i][j%3]),
                     else:
-                        # third board
-                        print str(self.board4[i%3][j%3]),
+                        # fourth board
+                        print " " + str(self.board4[i%3][j%3]),
+                if j==5:
+                    print "|",
         print("")
 
     def play_move(self, color, move):
@@ -103,3 +105,13 @@ class GameBoard():
 
     def __rotate_board(self, rot):
         return True
+
+    def __check_game_complete(self):
+        """Checks if the game is over."""
+
+        """
+        Ideas:
+        - Iterate through pieces horizontally, vertically, and diagonally, checking to see how many are in one line
+        - ...
+        """
+        return
