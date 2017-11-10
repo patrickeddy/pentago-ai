@@ -56,6 +56,8 @@ class GameBoard():
     def play_move(self, color, move):
         """Completes a move for a player."""
         parts = move.split(" ")
+        if not move or len(parts) < 2:
+            return False # can't play this move.
 
         pos = parts[0]
         rot = parts[1]
