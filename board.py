@@ -146,7 +146,6 @@ class GameBoard():
         """Rotates pieces on a board."""
         success = False
         new_board = self.get_empty_board()
-        print("direction: " + str(direction))
         if direction == "L":
             new_board[0][0] = board[0][2]
             new_board[0][1] = board[1][2]
