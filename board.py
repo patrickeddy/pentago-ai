@@ -71,24 +71,24 @@ class GameBoard():
         }
 
         # place piece and check winner
-        pp_success = self.__place_piece(color, pos)
+        pp_success = self.__place_piece(color, pos, boards)
         winner = self.__check_game_complete(boards)
         if winner:
             self.end_game(winner)
 
         # rotate board and check winner
-        rb_success = self.__rotate_board(rot)
+        rb_success = self.__rotate_board(rot, boards)
         winner = self.__check_game_complete(boards)
         if winner:
             self.end_game(winner)
 
         return pp_success and rb_success
 
-    def place_piece(self, color, pos):
+    def place_piece(self, color, pos, boards):
         """Helper method to access private method."""
-        self.__place_piece(color, pos)
+        self.__place_piece(color, pos, boards)
 
-    def __place_piece(self, color, pos):
+    def __place_piece(self, color, pos, boards):
         parts = pos.split("/")
 
         subboard = parts[0]
@@ -100,13 +100,13 @@ class GameBoard():
         succeeded = False
 
         if subboard == "1":
-            succeeded = self.__place_piece_on_subboard(self.board1, subpos)
+            succeeded = self.__place_piece_on_subboard(boards["board1"], subpos)
         elif subboard == "2":
-            succeeded =  self.__place_piece_on_subboard(self.board2, subpos)
+            succeeded =  self.__place_piece_on_subboard(boards["board2"], subpos)
         elif subboard == "3":
-            succeeded = self.__place_piece_on_subboard(self.board3, subpos)
+            succeeded = self.__place_piece_on_subboard(boards["board3"], subpos)
         elif subboard == "4":
-            succeeded = self.__place_piece_on_subboard(self.board4, subpos)
+            succeeded = self.__place_piece_on_subboard(boards["board4"], subpos)
 
         return succeeded
 
@@ -136,23 +136,23 @@ class GameBoard():
         else:
             return False
 
-    def do_rotation(self, rot):
+    def do_rotation(self, rot, boards):
         """Helper function for hook into private method."""
-        self.__rotate_board(rot)
+        self.__rotate_board(rot, boards)
 
-    def __rotate_board(self, rot):
+    def __rotate_board(self, rot, boards):
         """Translates rotation command."""
         b = rot[0] # board
         d = rot[1] # direction
 
         if b == "1":
-            return self.__do_rotation(self.board1, d)
+            return self.__do_rotation(boards["board1"], d)
         elif b == "2":
-            return self.__do_rotation(self.board2, d)
+            return self.__do_rotation(boards["board2"], d)
         elif b == "3":
-            return self.__do_rotation(self.board3, d)
+            return self.__do_rotation(boards["board3"], d)
         elif b == "4":
-            return self.__do_rotation(self.board4, d)
+            return self.__do_rotation(boards["board4"], d)
 
     def __do_rotation(self, board, direction):
         """Rotates pieces on a board."""
