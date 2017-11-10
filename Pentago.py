@@ -50,7 +50,7 @@ def ai_move():
 
 def prompt_player_move():
     """Prompts and initiates action by player."""
-    move = str(raw_input("\nYour turn to move.\nEx: 4/2 2L\n\n: ")).upper()
+    move = str(raw_input("\nYour turn to move.\n\n: ")).upper()
     if (move != "Q"):
         success = gb.play_move(player_color, move)
         if not success:

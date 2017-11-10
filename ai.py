@@ -18,7 +18,7 @@ class AI():
         # creates the start node for alphabeta
         start_node = Node(board, self.color, boards)
         # get the heuristic and best move
-        h = self.alphabeta(start_node, 31, 99999, -99999, False)
+        h = self.alphabeta(start_node, 200, 99999, -99999, False)
         print("h is: " + str(h))
         best_move = self.__get_best_move_from_h(start_node, h)
 
@@ -55,7 +55,7 @@ class AI():
 
         node.get_move_options() # gets and sets the children for the node
 
-        if node.color == maxPlayer:
+        if maxPlayer:
             node.v = -99999
             for child in node.children:
                 node.v = max(node.v, self.alphabeta(child, depth-1, alpha, beta, False)) # going to the min player
@@ -156,7 +156,7 @@ class Node():
 
         for pos in filled_spots: # loop through all spots
             current_pos = pos
-
+            print("pos: " + str(pos))
             # check all diag up left
             while current_pos-7 in filled_spots:
                 score += conseq_tile_score
@@ -195,6 +195,7 @@ class Node():
 
             # check all down diag left
             while current_pos+5 in filled_spots:
+                score += conseq_tile_score
                 current_pos += 5
             current_pos = pos # reset
 
@@ -321,18 +322,18 @@ class Node():
                     if (i < 3):
                         # first board
                         if self.board1[i][j] == marker:
-                            spots.append((i*6)+j) # get pos 1-36
+                            spots.append((i*6)+j+1) # get pos 1-36
                     else:
                         # third board
                         if self.board3[i%3][j] == marker:
-                            spots.append((i*6)+j)
+                            spots.append((i*6)+j+1)
                 else:
                     if (i < 3):
                         # second board
                         if self.board2[i][j%3] == marker:
-                            spots.append((i*6)+j)
+                            spots.append((i*6)+j+1)
                     else:
                         # fourth board
                         if self.board4[i%3][j%3] == marker:
-                            spots.append((i*6)+j)
+                            spots.append((i*6)+j+1)
         return spots
