@@ -9,11 +9,33 @@ class AI():
     def move(self, board):
         """Finds best move via Minimax alpha-beta pruning, and makes the move."""
         start_node = Node(board, self.color, [board.board1, board.board2, board.board3, board.board4]) # creates the start node for alphabeta
-        # winner = self.alphabeta(start_node, 2, 9999, -9999, self.color)
+        (best_move, heuristic) = self.alphabeta(start_node, 2, 99999, -99999, True)
+        print("best move was: " + str(best_move))
+        board.play_move(self.color, best_move) # ai makes move
 
     def alphabeta(self, node, depth, alpha, beta, maxPlayer):
-        return
+        if depth = 0:
+            return node.get_utility()
 
+        node.get_move_options() # gets and sets the children for the node
+
+        if node.color == maxPlayer:
+            node.v = -99999
+            for child in node.children:
+                node.v = max(node.v, self.alphabeta(child, depth-1, alpha, beta, False)) # going to the min player
+                alpha = max(alpha, node.v) # get the max of the nodes utility or alpha
+                if beta <= alpha:
+                    break # cut off this node subtree
+            return (node.move, node.v)
+        else:
+            node.v = 99999
+            for child in node.children:
+                node.v = min(node.v, self.alphabeta(child, depth-1, alpha, beta, True))
+                beta = min(beta, node.v)
+                if beta <= alpha:
+                break # cut off this node subtree
+
+            return (node.move, node.v)
 
 class Node():
     def __init__(self, game_board, color, boards):
@@ -31,7 +53,7 @@ class Node():
         self.v = 0
         self.children = []
 
-    def __get_move_options(self):
+    def get_move_options(self):
         """Gets the permutations."""
         empties = self.__get_empty_spots()
         moves = []
@@ -61,7 +83,7 @@ class Node():
         move.do_rotation(rot) # do rotation
         return move
 
-    def update_utility(self):
+    def get_utility(self):
         """Updates the utility value of this node based on a heuristic."""
         winning_score = 99999   # Winner
         three_row = 100         # 3
@@ -75,9 +97,9 @@ class Node():
         winner = self.gb.check_game_complete_for_boards(node_boards)
         if winner == self.color:
             # if game is complete for this node, make utility winner
-            self.v = winning_score
-
-        self.v = self.__get_h(node_boards, two_row, three_row)
+            return winning_score
+        else:
+            return self.__get_h(node_boards, two_row, three_row)
 
     def __get_h(self, boards, two_row_score, three_row_score):
         # checks if it has at least three or two in a row
