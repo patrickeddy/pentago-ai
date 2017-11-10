@@ -1,15 +1,15 @@
 # AI Module
 
-import GameBoard from board
+from board import GameBoard
 
 class AI():
-    def __init__(self, color, board):
+    def __init__(self, color):
         self.color = color
 
     def move(self, board):
         """Finds best move via Minimax alpha-beta pruning, and makes the move."""
         start_node = Node([board.board1, board.board2, board.board3, board.board4]) # creates the start node for alphabeta
-        winner = self.alphabeta(start_node, )
+        # winner = self.alphabeta(start_node, 2, 9999, -9999, self.color)
 
     def alphabeta(self, node, depth, alpha, beta, maxPlayer):
         return
@@ -26,7 +26,7 @@ class Node():
         # Node utilities
         self.move = ""
         self.v = 0
-        self.children = self.__get_move_options()
+        self.children = []
 
     def __get_move_options(self):
         """Gets the permutations."""
@@ -48,7 +48,7 @@ class Node():
 
             moves.append(m1, m2, m3, m4, m5, m6, m7, m8)
 
-        return moves
+        self.children = moves
 
     def __get_move_for_rotation(self, subboard, pos, rot):
         """Gets the permutation based on the piece placement and rotation."""
@@ -61,6 +61,7 @@ class Node():
 
     def __update_utility(self):
         """Updates the utility value of this node based on a heuristic."""
+        #TODO: Implement heuristics for boards
         return
 
 
@@ -71,21 +72,21 @@ class Node():
         """Gets the open spots for placement."""
         spots = []
         marker = "."
-        for (i in range(6)):
-            for (j in range(6)):
+        for i in range(6):
+            for j in range(6):
                 if (j < 3):
                     if (i < 3):
                         # first board
-                        if self.gb.board1[i][j] == marker:
+                        if self.board1[i][j] == marker:
                             spots.append(("1", (i*3)+(j+1)) ) # get the subboard and pos
                     else:
                         # third board
-                        if self.gb.board3[i%3][j] == marker:
+                        if self.board3[i%3][j] == marker:
                             spots.append(("3", (i*3)+(j+1)) )
                 else:
                     if (i < 3):
                         # second board
-                        if self.gb.board2[i][j%3] == marker:
+                        if self.board2[i][j%3] == marker:
                             spots.append(("2", (i*3)+(j+1)) )
                     else:
                         # fourth board
