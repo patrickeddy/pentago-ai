@@ -72,6 +72,10 @@ class GameBoard():
 
         return pp_success and rb_success
 
+    def place_piece(self, color, pos):
+        """Helper method to access private method."""
+        self.__place_piece(color, pos)
+
     def __place_piece(self, color, pos):
         parts = pos.split("/")
 
@@ -119,6 +123,10 @@ class GameBoard():
             return True
         else:
             return False
+
+    def do_rotation(self, rot):
+        """Helper function for hook into private method."""
+        self.__rotate_board(rot)
 
     def __rotate_board(self, rot):
         """Translates rotation command."""
