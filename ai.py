@@ -19,7 +19,7 @@ class AI():
         # creates the start node for alphabeta
         start_node = Node(board, self.color, boards)
         # get the heuristic and best move
-        h = self.alphabeta(start_node, 100, 99999, -99999, True)
+        h = self.alphabeta(start_node, 500, 99999, -99999, True)
         print("h is: " + str(h))
         best_move = self.__get_best_move_from_h(start_node, h)
 
