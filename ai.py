@@ -17,9 +17,10 @@ class AI():
             "board4": board.board4
         }
         # creates the start node for alphabeta
-        start_node = Node(board, self.color, boards)
+        opp_color = "b" if self.color == "w" else  "w"
+        start_node = Node(board, opp_color, boards)
         # get the heuristic and best move
-        h = self.alphabeta(start_node, 500, 99999, -99999, True)
+        h = self.alphabeta(start_node, 500, 99999, -99999, False)
         print("h is: " + str(h))
         best_move = self.__get_best_move_from_h(start_node, h)
 
@@ -59,7 +60,7 @@ class AI():
         if maxPlayer:
             node.v = -99999
             for child in node.children:
-                node.v = max(node.v, self.alphabeta(child, depth-1, alpha, beta, False)) # going to the min player
+                node.v = max(node.v, self.alphabeta(child, depth-1, alpha, beta, True)) # going to the min player
                 alpha = max(alpha, node.v) # get the max of the nodes utility or alpha
                 if beta <= alpha:
                     break # cut off this node subtree
