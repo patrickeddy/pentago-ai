@@ -67,5 +67,6 @@ while True:
         gb.print_full_board()
         prompt_player_move()
     else: # let ai go first
+        gb.print_full_board()
         ai_move()
     print("- - - - - - - - - - - - - - - - - - - ")

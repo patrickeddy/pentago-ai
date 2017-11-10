@@ -2,6 +2,7 @@
 
 from board import GameBoard
 from random import randint
+from copy import deepcopy
 
 class AI():
     def __init__(self, color):
@@ -18,7 +19,7 @@ class AI():
         # creates the start node for alphabeta
         start_node = Node(board, self.color, boards)
         # get the heuristic and best move
-        h = self.alphabeta(start_node, 200, 99999, -99999, False)
+        h = self.alphabeta(start_node, 100, 99999, -99999, True)
         print("h is: " + str(h))
         best_move = self.__get_best_move_from_h(start_node, h)
 
@@ -77,11 +78,10 @@ class Node():
     def __init__(self, game_board, color, boards):
         self.gb = game_board                        # primary GameBoard that manages the game
         self.color = color
-        # Found this array deepcopy solution from Ryan Ye at stackoverflow.com/a/6533065
-        self.board1 = [row[:] for row in boards["board1"]] # copy all of the boards into this one
-        self.board2 = [row[:] for row in boards["board2"]]
-        self.board3 = [row[:] for row in boards["board3"]]
-        self.board4 = [row[:] for row in boards["board4"]]
+        self.board1 = deepcopy(boards["board1"]) # copy all of the boards into this one
+        self.board2 = deepcopy(boards["board2"])
+        self.board3 = deepcopy(boards["board3"])
+        self.board4 = deepcopy(boards["board4"])
 
         # Node utilities
         self.move = ""
@@ -145,10 +145,10 @@ class Node():
             # if game is complete for this node, make utility winner
             return winning_score
         else:
-            h = self.__get_h(node_boards, two_row_score, three_row_score, winning_combo_score)
+            h = self.__get_h(two_row_score, three_row_score, winning_combo_score)
             return h
 
-    def __get_h(self, boards, two_row_score, three_row_score, winning_combo_score):
+    def __get_h(self, two_row_score, three_row_score, winning_combo_score):
         # checks if it has at least three or two in a row
         score = 0
         conseq_tile_score = 50
@@ -156,7 +156,7 @@ class Node():
 
         for pos in filled_spots: # loop through all spots
             current_pos = pos
-            print("pos: " + str(pos))
+            # print("pos: " + str(pos))
             # check all diag up left
             while current_pos-7 in filled_spots:
                 score += conseq_tile_score
