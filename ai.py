@@ -8,7 +8,7 @@ class AI():
 
     def move(self, board):
         """Finds best move via Minimax alpha-beta pruning, and makes the move."""
-        start_node = Node([board.board1, board.board2, board.board3, board.board4]) # creates the start node for alphabeta
+        start_node = Node(self.color, [board.board1, board.board2, board.board3, board.board4]) # creates the start node for alphabeta
         # winner = self.alphabeta(start_node, 2, 9999, -9999, self.color)
 
     def alphabeta(self, node, depth, alpha, beta, maxPlayer):
@@ -16,7 +16,8 @@ class AI():
 
 
 class Node():
-    def __init__(self, boards):
+    def __init__(self, color, boards):
+        self.color = "b" if color == "w" else "w" # alternate color as Node is created from parent
         # Found this array deepcopy solution from Ryan Ye at stackoverflow.com/a/6533065
         self.board1 = [row[:] for row in boards[0]] # copy all of the boards into this one
         self.board2 = [row[:] for row in boards[1]]
@@ -61,7 +62,11 @@ class Node():
 
     def __update_utility(self):
         """Updates the utility value of this node based on a heuristic."""
-        #TODO: Implement heuristics for boards
+        # Winner +1000
+        # 3 in a row +200
+        # 2 in a row +50
+        
+
         return
 
 

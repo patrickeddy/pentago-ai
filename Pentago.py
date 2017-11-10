@@ -9,9 +9,6 @@ PA 2 - Pentago
 HOW TO RUN:
 Play Pentago by running in terminal:
 `python Pentago.py`
-
-HOW TO MOVE:
-Each
 """
 
 import board
