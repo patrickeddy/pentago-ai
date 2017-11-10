@@ -61,11 +61,11 @@ class Node():
         move.do_rotation(rot) # do rotation
         return move
 
-    def __update_utility(self):
+    def update_utility(self):
         """Updates the utility value of this node based on a heuristic."""
-        winning_score = 1000    # Winner +1000
-        three_row = 200         # 3 in a row +200
-        two_row = 50            # 2 in a row +50
+        winning_score = 99999   # Winner
+        three_row = 100         # 3
+        two_row = 50            # 2
         node_boards = {
             "board1": self.board1,
             "board2": self.board2,
@@ -74,12 +74,59 @@ class Node():
         }
         winner = self.gb.check_game_complete_for_boards(node_boards)
         if winner == self.color:
-            # if game is complete for this node, make utility 1000
+            # if game is complete for this node, make utility winner
             self.v = winning_score
 
+        self.v = self.__get_h(node_boards, two_row, three_row)
 
-        return
+    def __get_h(self, boards, two_row_score, three_row_score):
+        # checks if it has at least three or two in a row
+        score = 0
+        three_row = False
+        two_row = False
+        for board in boards.values():
+            # DIAGONAL RATING
+            # 2inrow - four different ways
+            if (board[0][0] == self.color
+                and board[0][1] == self.color)
+                or (board[1][1] == self.color
+                    and board[2][2] == self.color)
+                or (board[0][2] == self.color
+                    and board[1][1] == self.color)
+                or (board[1][1] == self.color
+                    and board[2][2] == self.color):
+                    score += two_row_score
+            # 3inrow - two different ways
+            if (board[0][0] == self.color
+                and board[1][1] == self.color
+                and board[2][2] == self.color)
+                or (board[0][2] == self.color
+                    and board[1][1] == self.color
+                    and board[2][0] == self.color):
+                    score += three_row_score
 
+            # HORIZONTAL/VERTICAL RATING
+            for (i in range(3)):
+                # check threeinrow
+                if (board[i][0] == self.color # horizontal
+                    and board[i][1] == self.color
+                    and board[i][2] == self.color)
+                    or (board[0][i] == self.color
+                        and board[1][i] == self.color
+                        and board[2][i] == self.color) # vertical
+                    score += three_row_score
+
+                if (i<2): # skip the twoinrow checking if we're checking row/col #3
+                    for (j in range(2)):
+                        # check twoinrow
+                        if (board[i][j] == self.color
+                            and board[i][j+1] == self.color): # check horizonal
+                            score += two_row_score
+                        if (board[i][j] == self.color
+                            and board[i+1][j] == self.color): # check vertical
+                            score += two_row_score
+
+        return score
 
     def __get_boards(self):
         return [self.board1, self.board2, self.board3, self.board4]
