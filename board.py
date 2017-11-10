@@ -1,5 +1,7 @@
 # Board module
 
+empty_piece = "."
+
 class GameBoard():
     def __init__(self):
         self.board1 = self.get_empty_board()
@@ -8,37 +10,48 @@ class GameBoard():
         self.board4 = self.get_empty_board()
         self.turn = "b"
 
+    def end_game(self, winner):
+        self.print_full_board()
+        print("Game over! Winner is: " + str(winner))
+        exit()
+
     def complete_turn(self):
         self.turn = "w" if self.turn == "b" else "b"
 
     def get_empty_board(self):
-        return [["0", "0", "0"], ["0", "0", "0"], ["0", "0", "0"]]
+        return [[empty_piece, empty_piece, empty_piece], [empty_piece, empty_piece, empty_piece], [empty_piece, empty_piece, empty_piece]]
 
     def print_full_board(self):
         for i in range(6):
             print("") # add a new line for the board here
-            if (i == 3):
-                print "+------+------+"
+            if (i==0 or i == 3):
+                print "+-------+-------+"
             for j in range(6):
                 if j==0 or j == 3:
                     print "|",
                 if (j < 3):
                     if (i < 3):
                         # first board
-                        print " " + str(self.board1[i][j]),
+                        print str(self.board1[i][j]),
                     else:
                         # third board
-                        print " " + str(self.board3[i%3][j]),
+                        print str(self.board3[i%3][j]),
                 else:
                     if (i < 3):
                         # second board
-                        print " " + str(self.board2[i][j%3]),
+                        print str(self.board2[i][j%3]),
                     else:
                         # fourth board
-                        print " " + str(self.board4[i%3][j%3]),
+                        print str(self.board4[i%3][j%3]),
                 if j==5:
                     print "|",
+            if i==5:
+                print "\n+-------+-------+"
         print("")
+
+    # ===================
+    # PLAY MOVE
+    # ===================
 
     def play_move(self, color, move):
         """Completes a move for a player."""
@@ -50,8 +63,12 @@ class GameBoard():
         pp_success = self.__place_piece(color, pos)
         rb_success = self.__rotate_board(rot)
 
-        print("Placing piece status: " + str(pp_success))
-        print("Rotating board status: " + str(rb_success))
+        # print("Placing piece status: " + str(pp_success))
+        # print("Rotating board status: " + str(rb_success))
+
+        winner = self.__check_game_complete()
+        if winner: # Won the game!
+            self.end_game(winner)
 
         return pp_success and rb_success
 
@@ -98,20 +115,166 @@ class GameBoard():
 
     def __is_empty_spot(self, val):
         """Returns if spot is empty in board."""
-        if val == "0":
+        if val == empty_piece:
             return True
         else:
             return False
 
     def __rotate_board(self, rot):
-        return True
+        """Translates rotation command."""
+        b = rot[0] # board
+        d = rot[1] # direction
 
+        if b == "1":
+            return self.__do_rotation(self.board1, d)
+        elif b == "2":
+            return self.__do_rotation(self.board2, d)
+        elif b == "3":
+            return self.__do_rotation(self.board3, d)
+        elif b == "4":
+            return self.__do_rotation(self.board4, d)
+
+    def __do_rotation(self, board, direction):
+        """Rotates pieces on a board."""
+        success = False
+        new_board = self.get_empty_board()
+        print("direction: " + str(direction))
+        if direction == "L":
+            new_board[0][0] = board[0][2]
+            new_board[0][1] = board[1][2]
+            new_board[0][2] = board[2][2]
+            new_board[1][0] = board[0][1]
+            new_board[1][1] = board[1][1]
+            new_board[1][2] = board[2][1]
+            new_board[2][0] = board[0][0]
+            new_board[2][1] = board[1][0]
+            new_board[2][2] = board[2][0]
+            for i in range(3):
+                for j in range(3):
+                    board[i][j] = new_board[i][j]
+            success = True
+
+        elif direction == "R":
+            new_board[0][0] = board[2][0]
+            new_board[0][1] = board[1][0]
+            new_board[0][2] = board[0][0]
+            new_board[1][0] = board[2][1]
+            new_board[1][1] = board[1][1]
+            new_board[1][2] = board[0][1]
+            new_board[2][0] = board[2][2]
+            new_board[2][1] = board[1][2]
+            new_board[2][2] = board[0][2]
+            for i in range(3):
+                for j in range(3):
+                    board[i][j] = new_board[i][j]
+            success = True
+
+        return success
+
+    # ===================
+    # CHECK GAME COMPLETE
+    # ===================
     def __check_game_complete(self):
-        """Checks if the game is over."""
+        """Checks if the game is over and returns the winner."""
+        b_win = self.__check_color_win_diag("b") # check diagonal win first
+        w_win = self.__check_color_win_diag("w")
 
-        """
-        Ideas:
-        - Iterate through pieces horizontally, vertically, and diagonally, checking to see how many are in one line
-        - ...
-        """
-        return
+        if not (b_win or w_win): # no diagonal win...
+            for x in range(6): # now check the vertical and horizontal wins
+                b_win = self.__check_color_win_vert(x, "b") or self.__check_color_win_horiz(x, "b")
+                w_win = self.__check_color_win_vert(x, "w") or self.__check_color_win_horiz(x, "w")
+
+                if b_win or w_win:
+                    break # break this loop if we found the winner
+
+        winner = None
+        if b_win:
+            winner = "b"
+        elif w_win:
+            winner = "w"
+
+        return winner
+
+    def __check_color_win_vert(self, it, color):
+        if it <= 2:
+            # left half
+            if ((self.board1[0][it] == color
+                    and self.board1[1][it] == color
+                    and self.board1[2][it] == color
+                    and self.board3[0][it] == color
+                    and self.board3[1][it] == color) # first case for win
+                or (self.board1[1][it] == color
+                    and self.board1[2][it] == color
+                    and self.board3[0][it] == color
+                    and self.board3[1][it] == color
+                    and self.board3[2][it] == color)): # second case for win (shifted by 1)
+                return True
+        else:
+            # right half
+            if ((self.board2[0][it%3] == color
+                    and self.board2[1][it%3] == color
+                    and self.board2[2][it%3] == color
+                    and self.board4[0][it%3] == color
+                    and self.board4[1][it%3] == color) # first case for win
+                or (self.board2[1][it%3] == color
+                    and self.board2[2][it%3] == color
+                    and self.board4[0][it%3] == color
+                    and self.board4[1][it%3] == color
+                    and self.board4[2][it%3] == color)): # second case for win (shifted by 1)
+                return True
+
+
+    def __check_color_win_horiz(self, it, color):
+        if it <= 2:
+            # top half
+            if ((self.board1[it][0] == color
+                    and self.board1[it][1] == color
+                    and self.board1[it][2] == color
+                    and self.board2[it][0] == color
+                    and self.board2[it][1] == color) # first case for win
+                or (self.board1[it][1] == color
+                    and self.board1[it][2] == color
+                    and self.board2[it][0] == color
+                    and self.board2[it][1] == color
+                    and self.board2[it][2] == color)): # second case for win (shifted by 1)
+                return True
+        else:
+            # bottom half
+            if ((self.board3[it%3][0] == color
+                    and self.board3[it%3][1] == color
+                    and self.board3[it%3][2] == color
+                    and self.board4[it%3][0] == color
+                    and self.board4[it%3][1] == color) # first case for win
+                or (self.board3[it%3][1] == color
+                    and self.board3[it%3][2] == color
+                    and self.board4[it%3][0] == color
+                    and self.board4[it%3][1] == color
+                    and self.board4[it%3][2] == color)): # second case for win (shifted by 1)
+                return True
+
+
+    def __check_color_win_diag(self, color):
+        # There are only four ways you can win diagonally
+        if ((self.board1[0][0] == color
+              and self.board1[1][1] == color
+              and self.board1[2][2] == color
+              and self.board4[0][0] == color
+              and self.board4[1][1] == color)
+            or (self.board1[1][1] == color
+              and self.board1[2][2] == color
+              and self.board4[0][0] == color
+              and self.board4[1][1] == color
+              and self.board4[2][2] == color)
+            or (self.board2[0][2] == color
+              and self.board2[1][1] == color
+              and self.board2[2][0] == color
+              and self.board3[0][2] == color
+              and self.board3[1][1] == color)
+            or (self.board2[1][1] == color
+              and self.board2[2][0] == color
+              and self.board3[0][2] == color
+              and self.board3[1][1] == color
+              and self.board3[2][0] == color)):
+            return True
+        else:
+            return False
