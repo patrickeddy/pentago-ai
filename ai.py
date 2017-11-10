@@ -8,7 +8,7 @@ class AI():
 
     def move(self, board):
         """Finds best move via Minimax alpha-beta pruning, and makes the move."""
-        start_node = Node(self.color, [board.board1, board.board2, board.board3, board.board4]) # creates the start node for alphabeta
+        start_node = Node(board, self.color, [board.board1, board.board2, board.board3, board.board4]) # creates the start node for alphabeta
         # winner = self.alphabeta(start_node, 2, 9999, -9999, self.color)
 
     def alphabeta(self, node, depth, alpha, beta, maxPlayer):
@@ -16,8 +16,10 @@ class AI():
 
 
 class Node():
-    def __init__(self, color, boards):
-        self.color = "b" if color == "w" else "w" # alternate color as Node is created from parent
+    def __init__(self, game_board, color, boards):
+        self.gb = game_board                        # primary GameBoard that manages the game
+        self.opp_color = color                      # make parent color the opposing color
+        self.color = "b" if color == "w" else "w"   # alternate color as Node is created from parent
         # Found this array deepcopy solution from Ryan Ye at stackoverflow.com/a/6533065
         self.board1 = [row[:] for row in boards[0]] # copy all of the boards into this one
         self.board2 = [row[:] for row in boards[1]]
@@ -57,15 +59,24 @@ class Node():
         move.move = str(subboard) + "/" + str(pos) + str(rot) # assign the move to this node
         move.place_piece(self.color, str(subboard) + "/" + str(pos)) # place piece
         move.do_rotation(rot) # do rotation
-        move.update_utility() # update the utility value of the node
         return move
 
     def __update_utility(self):
         """Updates the utility value of this node based on a heuristic."""
-        # Winner +1000
-        # 3 in a row +200
-        # 2 in a row +50
-        
+        winning_score = 1000    # Winner +1000
+        three_row = 200         # 3 in a row +200
+        two_row = 50            # 2 in a row +50
+        node_boards = {
+            "board1": self.board1,
+            "board2": self.board2,
+            "board3": self.board3,
+            "board4": self.board4
+        }
+        winner = self.gb.check_game_complete_for_boards(node_boards)
+        if winner == self.color:
+            # if game is complete for this node, make utility 1000
+            self.v = winning_score
+
 
         return
 

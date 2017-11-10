@@ -60,9 +60,6 @@ class GameBoard():
         pos = parts[0]
         rot = parts[1]
 
-        pp_success = self.__place_piece(color, pos)
-        rb_success = self.__rotate_board(rot)
-
         # print("Placing piece status: " + str(pp_success))
         # print("Rotating board status: " + str(rb_success))
 
@@ -72,9 +69,17 @@ class GameBoard():
             "board3": self.board3,
             "board4": self.board4
         }
-        winner = self.__check_game_complete(boards) # check for winner with the current boards
 
-        if winner: # Won the game!
+        # place piece and check winner
+        pp_success = self.__place_piece(color, pos)
+        winner = self.__check_game_complete(boards)
+        if winner:
+            self.end_game(winner)
+
+        # rotate board and check winner
+        rb_success = self.__rotate_board(rot)
+        winner = self.__check_game_complete(boards)
+        if winner:
             self.end_game(winner)
 
         return pp_success and rb_success
@@ -188,6 +193,11 @@ class GameBoard():
     # ===================
     # CHECK GAME COMPLETE
     # ===================
+
+    def check_game_complete_for_boards(self, boards):
+        """Helper method that uses private method."""
+        self.__check_game_complete(boards)
+
     def __check_game_complete(self, boards):
         """Checks if the game is over and returns the winner."""
         b_win = self.__check_color_win_diag("b", boards) # check diagonal win first
