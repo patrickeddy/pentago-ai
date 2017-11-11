@@ -17,10 +17,9 @@ class AI():
             "board4": board.board4
         }
         # creates the start node for alphabeta
-        opp_color = "b" if self.color == "w" else  "w"
-        start_node = Node(board, opp_color, boards)
+        start_node = Node(board, self.color, boards)
         # get the heuristic and best move
-        h = self.alphabeta(start_node, 500, 99999, -99999, False)
+        h = self.alphabeta(start_node, 2, -99999, 99999, True)
         print("h is: " + str(h))
         best_move = self.__get_best_move_from_h(start_node, h)
 
@@ -31,7 +30,7 @@ class AI():
 
     def __get_best_move_from_h(self, node, h):
         """Fetches the actual move from the children based on the heuristic."""
-        if h == 0:
+        if h == 99999:
             # if the best heuristic is 0, pick a random place
             subboard = randint(1,4)
             pos = randint(1,9)
@@ -50,7 +49,6 @@ class AI():
     def alphabeta(self, node, depth, alpha, beta, maxPlayer):
         # print("node move: " + str(node.move))
         # print("node v: " + str(node.v))
-
         if depth == 0:
             # print("utility is: " + str(node.get_utility()))
             return node.get_utility()
@@ -59,18 +57,21 @@ class AI():
 
         if maxPlayer:
             node.v = -99999
+            current_alpha = alpha
             for child in node.children:
-                node.v = max(node.v, self.alphabeta(child, depth-1, alpha, beta, True)) # going to the min player
-                alpha = max(alpha, node.v) # get the max of the nodes utility or alpha
-                if beta <= alpha:
+                node.v = max(node.v, self.alphabeta(child, depth-1, current_alpha, beta, False)) # going to the min player
+                current_alpha = max(current_alpha, node.v) # get the max of the nodes utility or alpha
+                if beta <= current_alpha:
                     break # cut off this node subtree
+
             return node.v
         else:
             node.v = 99999
+            current_beta = beta
             for child in node.children:
-                node.v = min(node.v, self.alphabeta(child, depth-1, alpha, beta, True))
-                beta = min(beta, node.v)
-                if beta <= alpha:
+                node.v = min(node.v, self.alphabeta(child, depth-1, alpha, current_beta, True))
+                current_beta = min(current_beta, node.v)
+                if current_beta <= alpha:
                     break # cut off this node subtree
 
             return node.v
@@ -121,14 +122,13 @@ class Node():
 
     def __get_move_for(self, subboard, pos, rot):
         """Gets the permutation based on the piece placement and rotation."""
-        color = "b" if self.color == "w" else "w" # alternate colors
-        actual_pos = pos
 
+        color = "b" if self.color == "w" else "w" # alternate colors
         move = Node(self.gb, color, self.__get_board_dict()) # creates a new node with these boards
-        move.move = str(subboard) + "/" + str(actual_pos) + " " + str(rot) # assign the move to this node
+        move.move = str(subboard) + "/" + str(pos) + " " + str(rot) # assign the move to this node
 
         node_boards = self.__get_board_dict()
-        self.gb.place_piece(self.color, str(subboard) + "/" + str(actual_pos), node_boards) # place piece
+        self.gb.place_piece(self.color, str(subboard) + "/" + str(pos), node_boards) # place piece
         self.gb.do_rotation(rot, node_boards) # do rotation
         # print("move: " + str(move.move))
         return move
@@ -155,73 +155,43 @@ class Node():
         conseq_tile_score = 50
         filled_spots = self.__get_filled_spots()
 
+        max_conseq = 0
         for pos in filled_spots: # loop through all spots
-            current_pos = pos
             # print("pos: " + str(pos))
+
             # check all diag up left
-            while current_pos-7 in filled_spots:
-                score += conseq_tile_score
-                current_pos -= 7
-            current_pos = pos # reset
+            nc = self.__get_conseq_count(filled_spots, conseq_tile_score, pos, -7)
+            max_conseq = nc if nc > max_conseq else max_conseq
 
             # check all up
-            while current_pos-6 in filled_spots:
-                score += conseq_tile_score
-                current_pos -= 6
-            current_pos = pos # reset
+            nc = self.__get_conseq_count(filled_spots, conseq_tile_score, pos, -6)
+            max_conseq = nc if nc > max_conseq else max_conseq
 
             # check all up diag right
-            while current_pos-5 in filled_spots:
-                score += conseq_tile_score
-                current_pos -= 5
-            current_pos = pos # reset
+            nc = self.__get_conseq_count(filled_spots, conseq_tile_score, pos, -5)
+            max_conseq = nc if nc > max_conseq else max_conseq
 
             # check all right
-            while current_pos+1 in filled_spots:
-                score += conseq_tile_score
-                current_pos += 1
-            current_pos = pos # reset
+            nc = self.__get_conseq_count(filled_spots, conseq_tile_score, pos, 1)
+            max_conseq = nc if nc > max_conseq else max_conseq
 
             # check all down diag right
-            while current_pos+7 in filled_spots:
-                score += conseq_tile_score
-                current_pos += 7
-            current_pos = pos # reset
+            nc = self.__get_conseq_count(filled_spots, conseq_tile_score, pos, 7)
+            max_conseq = nc if nc > max_conseq else max_conseq
 
             # check all down
-            while current_pos+6 in filled_spots:
-                score += conseq_tile_score
-                current_pos += 6
-            current_pos = pos # reset
+            nc = self.__get_conseq_count(filled_spots, conseq_tile_score, pos, 6)
+            max_conseq = nc if nc > max_conseq else max_conseq
 
             # check all down diag left
-            while current_pos+5 in filled_spots:
-                score += conseq_tile_score
-                current_pos += 5
-            current_pos = pos # reset
+            nc = self.__get_conseq_count(filled_spots, conseq_tile_score, pos, 5)
+            max_conseq = nc if nc > max_conseq else max_conseq
 
-            while pos-1 in filled_spots: # check all left
-                score += conseq_tile_score
-                pos -= 1
-            current_pos = pos # reset
+            # check all left
+            nc = self.__get_conseq_count(filled_spots, conseq_tile_score, pos, -1)
+            max_conseq = nc if nc > max_conseq else max_conseq
 
-            # # CHECK TWO IN A ROW
-            # # diagonal
-            # if (sb == "1" or sb == "3"): # if we're subboards 1 or 3
-            #     if (pos % 3) < 3): # and we're not bordering another board
-            #         if ((sb, pos-4) in filled_spots     # up diag left
-            #             or
-            #             or (sb, pos-2) in filled_spots  # up diag right
-            #             or (sb, pos)
-            #             ):
-            #             score += two_row_score
-            #     else: # we're bordering board
-            #
-            # else: # subboard 2 or 4
-
-
-        # two_found_board = None
-        # three_found_board = None
+            score = max_conseq * 100 if max_conseq > 2 else max_conseq * 10
 
         # for board in boards.values():
         #     # DIAGONAL RATING
@@ -284,6 +254,15 @@ class Node():
 
         return score
 
+    def __get_conseq_count(self, filled_spots, conseq_tile_score, pos, vector):
+        """Find the max conseq count for direction."""
+        current_pos = pos
+        count = 0
+        while current_pos+vector in filled_spots:
+            current_pos += vector
+            count += 1
+        return count
+
     def __get_boards(self):
         return [self.board1, self.board2, self.board3, self.board4]
 
@@ -296,20 +275,20 @@ class Node():
                 if (j < 3):
                     if (i < 3):
                         # first board
-                        if self.board1[i][j] == marker:
+                        if self.gb.board1[i][j] == marker:
                             spots.append(("1", (i*3)+(j+1)) ) # get the subboard and pos
                     else:
                         # third board
-                        if self.board3[i%3][j] == marker:
+                        if self.gb.board3[i%3][j] == marker:
                             spots.append(("3", ((i%3)*3)+(j+1)) )
                 else:
                     if (i < 3):
                         # second board
-                        if self.board2[i][j%3] == marker:
+                        if self.gb.board2[i][j%3] == marker:
                             spots.append(("2", (i*3)+((j%3)+1)) )
                     else:
                         # fourth board
-                        if self.board4[i%3][j%3] == marker:
+                        if self.gb.board4[i%3][j%3] == marker:
                             spots.append(("4", ((i%3)*3)+((j%3)+1)) )
         return spots
 
