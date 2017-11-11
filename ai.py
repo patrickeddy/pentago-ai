@@ -20,10 +20,10 @@ class AI():
         start_node = Node(board, self.color, boards)
         # get the heuristic and best move
         h = self.alphabeta(start_node, 2, -99999, 99999, True)
-        print("h is: " + str(h))
+        # print("h of child to choose is: " + str(h))
         best_move = self.__get_best_move_from_h(start_node, h)
 
-        print("Winning move is: " + str(best_move))
+        print(": " + str(best_move))
 
         # ai makes the move
         board.play_move(self.color, best_move)
@@ -157,7 +157,6 @@ class Node():
 
         max_conseq = 0
         for pos in filled_spots: # loop through all spots
-            # print("pos: " + str(pos))
 
             # check all diag up left
             nc = self.__get_conseq_count(filled_spots, conseq_tile_score, pos, -7)
@@ -192,65 +191,6 @@ class Node():
             max_conseq = nc if nc > max_conseq else max_conseq
 
             score = max_conseq * 100 if max_conseq > 2 else max_conseq * 10
-
-        # for board in boards.values():
-        #     # DIAGONAL RATING
-        #     # 2inrow - four different ways
-        #     if ((board[0][0] == self.color
-        #             and board[0][1] == self.color)
-        #         or (board[1][1] == self.color
-        #             and board[2][2] == self.color)
-        #         or (board[0][2] == self.color
-        #             and board[1][1] == self.color)
-        #         or (board[1][1] == self.color
-        #             and board[2][2] == self.color)):
-        #             score += two_row_score
-        #             two_found_board = board
-        #
-        #     # 3inrow - two different ways
-        #     if ((board[0][0] == self.color
-        #         and board[1][1] == self.color
-        #         and board[2][2] == self.color)
-        #         or (board[0][2] == self.color
-        #             and board[1][1] == self.color
-        #             and board[2][0] == self.color)):
-        #             score += three_row_score
-        #             three_found_board = board
-        #
-        #     if ((two_found_board and three_found_board)
-        #         and two_found_board != three_found_board): # we found a winning combo
-        #         score += winning_combo_score
-        #         two_found_board = None
-        #         three_found_board = None
-        #
-        #     # HORIZONTAL/VERTICAL RATING
-        #     for i in range(3):
-        #         # check threeinrow
-        #         if ((board[i][0] == self.color # horizontal
-        #             and board[i][1] == self.color
-        #             and board[i][2] == self.color)
-        #             or (board[0][i] == self.color
-        #                 and board[1][i] == self.color
-        #                 and board[2][i] == self.color)): # vertical
-        #             score += three_row_score
-        #             two_found_board = board
-        #
-        #         if (i<2): # skip the twoinrow checking if we're checking row/col #3
-        #             for j in range(2):
-        #                 # check twoinrow
-        #                 if (board[i][j] == self.color
-        #                     and board[i][j+1] == self.color): # check horizonal
-        #                     score += two_row_score
-        #                 if (board[i][j] == self.color
-        #                     and board[i+1][j] == self.color): # check vertical
-        #                     score += two_row_score
-        #                     two_found_board = board
-        #
-        #         if ((two_found_board and three_found_board)
-        #             and two_found_board != three_found_board): # we found a winning combo
-        #             score += winning_combo_score
-        #             two_found_board = None
-        #             three_found_board = None
 
         return score
 

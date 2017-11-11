@@ -79,10 +79,12 @@ class GameBoard():
             self.end_game(winner)
 
         # rotate board and check winner
-        rb_success = self.__rotate_board(rot, boards)
-        winner = self.__check_game_complete(boards)
-        if winner:
-            self.end_game(winner)
+        rb_success = False
+        if pp_success:
+            rb_success = self.__rotate_board(rot, boards)
+            winner = self.__check_game_complete(boards)
+            if winner:
+                self.end_game(winner)
 
         return pp_success and rb_success
 
