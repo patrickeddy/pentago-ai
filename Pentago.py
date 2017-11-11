@@ -5,12 +5,6 @@ TCSS 435
 PA 2 - Pentago
 """
 
-"""
-HOW TO RUN:
-Play Pentago by running in terminal:
-`python Pentago.py`
-"""
-
 import board
 import ai
 
