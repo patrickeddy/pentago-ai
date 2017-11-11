@@ -7,6 +7,7 @@ from copy import deepcopy
 class AI():
     def __init__(self, color):
         self.color = color
+        self.nodes_expanded = 0
 
     def move(self, board):
         """Finds best move via Minimax alpha-beta pruning, and makes the move."""
@@ -18,12 +19,17 @@ class AI():
         }
         # creates the start node for alphabeta
         start_node = Node(board, self.color, boards)
+
+        self.nodes_expanded = 0 # reset nodes expanded to zero before alg
+
         # get the heuristic and best move
-        h = self.alphabeta(start_node, 2, -99999, 99999, True)
-        # print("h of child to choose is: " + str(h))
+        # h = self.minimax(start_node, 2, True)                       # Minimax
+        h = self.alphabeta(start_node, 2, -99999, 99999, True)    # Alpha-Beta
         best_move = self.__get_best_move_from_h(start_node, h)
 
         print(": " + str(best_move))
+
+        # print("Nodes expanded: " + str(self.nodes_expanded))
 
         # ai makes the move
         board.play_move(self.color, best_move)
@@ -46,6 +52,32 @@ class AI():
                     # found the child, get the move
                     return child.move
 
+    def minimax(self, node, depth, maxPlayer):
+        if depth == 0:
+            # print("utility is: " + str(node.get_utility()))
+            return node.get_utility()
+
+        node.get_move_options() # gets and sets the children for the node
+
+        if maxPlayer:
+            best_value = -99999
+            for child in node.children:
+                self.nodes_expanded += 1
+
+                node.v = self.minimax(child, depth-1, False) # going to the min player
+                best_value = max(best_value, node.v) # get the max of the nodes
+
+            return best_value
+        else:
+            best_value = 99999
+            for child in node.children:
+                self.nodes_expanded += 1
+
+                node.v = self.minimax(child, depth-1, True)
+                best_value = min(best_value, node.v)
+            return best_value
+
+
     def alphabeta(self, node, depth, alpha, beta, maxPlayer):
         # print("node move: " + str(node.move))
         # print("node v: " + str(node.v))
@@ -59,6 +91,7 @@ class AI():
             node.v = -99999
             current_alpha = alpha
             for child in node.children:
+                self.nodes_expanded += 1
                 node.v = max(node.v, self.alphabeta(child, depth-1, current_alpha, beta, False)) # going to the min player
                 current_alpha = max(current_alpha, node.v) # get the max of the nodes utility or alpha
                 if beta <= current_alpha:
@@ -69,6 +102,7 @@ class AI():
             node.v = 99999
             current_beta = beta
             for child in node.children:
+                self.nodes_expanded += 1
                 node.v = min(node.v, self.alphabeta(child, depth-1, alpha, current_beta, True))
                 current_beta = min(current_beta, node.v)
                 if current_beta <= alpha:
