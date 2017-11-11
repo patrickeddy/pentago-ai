@@ -1,0 +1,5 @@
+How to run Pentago:
+
+1. Open up Terminal and cd into the project folder
+2. Run 'python Pentago.py'
+3. Follow the prompt to play
