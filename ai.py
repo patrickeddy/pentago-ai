@@ -224,7 +224,11 @@ class Node():
             nc = self.__get_conseq_count(filled_spots, conseq_tile_score, pos, -1)
             max_conseq = nc if nc > max_conseq else max_conseq
 
-            score = max_conseq * 100 if max_conseq > 2 else max_conseq * 10
+
+            if max_conseq  <= 2:
+                score = max_conseq * 100
+            elif max_conseq <= 4:
+                score = max_conseq * 1000
 
         return score
 
