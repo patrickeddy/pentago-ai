@@ -3,6 +3,7 @@
 from board import GameBoard
 from random import randint
 from copy import deepcopy
+import math
 
 class AI():
     def __init__(self, color):
@@ -23,20 +24,23 @@ class AI():
 
         self.nodes_expanded = 0 # reset nodes expanded to zero before alg
         self.move_count += 1 # increment the move_count
+
         depth = 2
-        if self.move_count > 8:
+        if self.move_count > 2:
             depth = 3
-        elif self.move_count > 20:
+        elif self.move_count > 10:
             depth = 4
+        elif self.move_count > 20:
+            depth = 5
 
         # get the heuristic and best move
-        # h = self.minimax(start_node, depth, True)                       # Minimax
+        # h = if self.move_count <=1 else self.minimax(start_node, depth, True)  # Minimax
         h = self.alphabeta(start_node, depth, -99999, 99999, True)    # Alpha-Beta
         best_move = self.__get_best_move_from_h(start_node, h)
 
         print(": " + str(best_move))
 
-        # print("Nodes expanded: " + str(self.nodes_expanded))
+        print("Nodes expanded: " + str(self.nodes_expanded))
 
         # ai makes the move
         board.play_move(self.color, best_move)
@@ -176,10 +180,7 @@ class Node():
 
     def get_utility(self):
         """Updates the utility value of this node based on a heuristic."""
-        winning_score = 99999       # Winner
-        winning_combo_score = 500   # 3 on one board, 2 on the other
-        three_row_score = 100       # 3
-        two_row_score = 50          # 2
+        winning_score = 99999999       # Winner
 
         node_boards = self.__get_board_dict()
         winner = self.gb.check_game_complete_for_boards(node_boards)
@@ -187,59 +188,59 @@ class Node():
             # if game is complete for this node, make utility winner
             return winning_score
         else:
-            h = self.__get_h(two_row_score, three_row_score, winning_combo_score)
+            h = self.__get_h(winning_score)
             return h
 
-    def __get_h(self, two_row_score, three_row_score, winning_combo_score):
+    def __get_h(self, winning_score):
         # checks if it has at least three or two in a row
         score = 0
-        conseq_tile_score = 50
         filled_spots = self.__get_filled_spots()
 
         max_conseq = 0
         for pos in filled_spots: # loop through all spots
 
             # check all diag up left
-            nc = self.__get_conseq_count(filled_spots, conseq_tile_score, pos, -7)
+            nc = self.__get_conseq_count(filled_spots, pos, -7)
             max_conseq = nc if nc > max_conseq else max_conseq
 
             # check all up
-            nc = self.__get_conseq_count(filled_spots, conseq_tile_score, pos, -6)
+            nc = self.__get_conseq_count(filled_spots, pos, -6)
             max_conseq = nc if nc > max_conseq else max_conseq
 
             # check all up diag right
-            nc = self.__get_conseq_count(filled_spots, conseq_tile_score, pos, -5)
+            nc = self.__get_conseq_count(filled_spots, pos, -5)
             max_conseq = nc if nc > max_conseq else max_conseq
 
             # check all right
-            nc = self.__get_conseq_count(filled_spots, conseq_tile_score, pos, 1)
+            nc = self.__get_conseq_count(filled_spots, pos, 1)
             max_conseq = nc if nc > max_conseq else max_conseq
 
             # check all down diag right
-            nc = self.__get_conseq_count(filled_spots, conseq_tile_score, pos, 7)
+            nc = self.__get_conseq_count(filled_spots, pos, 7)
             max_conseq = nc if nc > max_conseq else max_conseq
 
             # check all down
-            nc = self.__get_conseq_count(filled_spots, conseq_tile_score, pos, 6)
+            nc = self.__get_conseq_count(filled_spots, pos, 6)
             max_conseq = nc if nc > max_conseq else max_conseq
 
             # check all down diag left
-            nc = self.__get_conseq_count(filled_spots, conseq_tile_score, pos, 5)
+            nc = self.__get_conseq_count(filled_spots, pos, 5)
             max_conseq = nc if nc > max_conseq else max_conseq
 
             # check all left
-            nc = self.__get_conseq_count(filled_spots, conseq_tile_score, pos, -1)
+            nc = self.__get_conseq_count(filled_spots, pos, -1)
             max_conseq = nc if nc > max_conseq else max_conseq
 
-
-            if max_conseq  <= 2:
-                score = max_conseq * 100
-            elif max_conseq <= 4:
-                score = max_conseq * 1000
+            if max_conseq == 5:
+                score = winning_score
+            elif max_conseq > 1:
+                score = math.pow(10, max_conseq)
+            else:
+                score = 10
 
         return score
 
-    def __get_conseq_count(self, filled_spots, conseq_tile_score, pos, vector):
+    def __get_conseq_count(self, filled_spots, pos, vector):
         """Find the max conseq count for direction."""
         current_pos = pos
         count = 0
