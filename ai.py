@@ -8,6 +8,7 @@ class AI():
     def __init__(self, color):
         self.color = color
         self.nodes_expanded = 0
+        self.move_count = 0
 
     def move(self, board):
         """Finds best move via Minimax alpha-beta pruning, and makes the move."""
@@ -21,10 +22,16 @@ class AI():
         start_node = Node(board, self.color, boards)
 
         self.nodes_expanded = 0 # reset nodes expanded to zero before alg
+        self.move_count += 1 # increment the move_count
+        depth = 2
+        if self.move_count > 8:
+            depth = 3
+        elif self.move_count > 20:
+            depth = 4
 
         # get the heuristic and best move
-        # h = self.minimax(start_node, 2, True)                       # Minimax
-        h = self.alphabeta(start_node, 2, -99999, 99999, True)    # Alpha-Beta
+        # h = self.minimax(start_node, depth, True)                       # Minimax
+        h = self.alphabeta(start_node, depth, -99999, 99999, True)    # Alpha-Beta
         best_move = self.__get_best_move_from_h(start_node, h)
 
         print(": " + str(best_move))

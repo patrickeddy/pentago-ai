@@ -1,5 +1,7 @@
 # Board module
 
+import re
+
 empty_piece = "."
 
 class GameBoard():
@@ -61,6 +63,12 @@ class GameBoard():
 
         pos = parts[0]
         rot = parts[1]
+
+        correct_format = (re.search('\d/\d', pos)
+                          and re.search('\d\w', rot)
+                          and len(rot) == 2 and rot[1] in ["L", "R"])
+        if not correct_format:
+            return False
 
         # print("Placing piece status: " + str(pp_success))
         # print("Rotating board status: " + str(rb_success))
