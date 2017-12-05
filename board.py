@@ -1,4 +1,6 @@
-# Board module
+# Patrick Eddy
+# Bad-ass Pentago Playing AI
+# TCSS 435, University of Washington
 
 import re
 

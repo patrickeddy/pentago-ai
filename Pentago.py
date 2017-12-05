@@ -1,9 +1,6 @@
-"""
-Patrick Eddy
-TCSS 435
-
-PA 2 - Pentago
-"""
+# Patrick Eddy
+# Bad-ass Pentago Playing AI
+# TCSS 435, University of Washington
 
 import board
 import ai

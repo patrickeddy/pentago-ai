@@ -1,4 +1,6 @@
-# AI Module
+# Patrick Eddy
+# Bad-ass Pentago Playing AI
+# TCSS 435, University of Washington
 
 from board import GameBoard
 from random import randint
@@ -40,7 +42,7 @@ class AI():
 
         print(": " + str(best_move))
 
-        print("Nodes expanded: " + str(self.nodes_expanded))
+        # print("Nodes expanded: " + str(self.nodes_expanded))
 
         # ai makes the move
         board.play_move(self.color, best_move)
