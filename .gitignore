@@ -1,3 +1,5 @@
 .vscode/*
 ./*.pyc
-./*.txt
+./Instruction.txt
+./Output.txt
+./Readme.txt
