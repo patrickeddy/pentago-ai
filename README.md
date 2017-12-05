@@ -8,7 +8,7 @@ Before you play, you should probably read the [rules of Pentago](https://en.wiki
 ## Play
 
 1. Open up Terminal and cd into the project folder
-2. Run 'python Pentago.py'
+2. Run `python Pentago.py`
 3. Follow the prompt to play
 
 ## Preview
